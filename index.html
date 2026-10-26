@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gyro Lab · Gyroscopic Apparatus</title>
+<style>
+:root{--bg:#F4EEDC;--paper:#FBF8EE;--ink:#1C2B4B;--muted:#5F6577;--line:#1C2B4B;--red:#D4412A;--cyan:#1C8FBF;--chip:#EDE6D1;--grid:#E6DDC3;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1626;--paper:#172038;--ink:#EDE8D8;--muted:#9AA3BA;--line:#8FA0C4;--red:#FF6A50;--cyan:#4FC3F0;--chip:#223055;--grid:#1A2542;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1626;--paper:#172038;--ink:#EDE8D8;--muted:#9AA3BA;--line:#8FA0C4;--red:#FF6A50;--cyan:#4FC3F0;--chip:#223055;--grid:#1A2542;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+ background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px}
+.wrap{max-width:980px;margin:0 auto;padding:18px 16px 40px}
+.tag{display:inline-block;background:var(--ink);color:var(--bg);font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;padding:6px 9px;letter-spacing:.04em}
+.logo{font:900 44px/1 system-ui,sans-serif;letter-spacing:-.02em;margin:12px 0 4px;text-shadow:-2px 0 var(--red),2px 0 var(--cyan)}
+.sub{font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+h1{font-size:26px;line-height:1.15;margin:22px 0 6px}
+.lead{color:var(--muted);margin:0 0 16px;max-width:60ch}
+.card{background:var(--paper);border:1.5px solid var(--line);margin:14px 0;position:relative}
+.lbl{font:600 10.5px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.card>.lbl{display:inline-block;padding:7px 10px;border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line);background:var(--bg)}
+#stage{position:relative;height:min(62vw,420px);min-height:300px;overflow:hidden;background:transparent}
+#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+#c{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#hud{position:absolute;left:10px;bottom:8px;font:11px ui-monospace,Menlo,monospace;color:var(--muted);pointer-events:none;background:color-mix(in srgb,var(--paper) 80%,transparent);padding:3px 6px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 22px;padding:14px;border-top:1.5px solid var(--line)}
+.ctl label{display:block;font:600 12px ui-monospace,Menlo,monospace;margin-bottom:4px}
+.ctl label b{float:right;color:var(--red)}
+input[type=range]{width:100%;accent-color:var(--red);height:28px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;padding:0 14px 14px}
+button{font:600 13px system-ui,sans-serif;color:var(--ink);background:var(--chip);border:1.5px solid var(--line);padding:9px 13px;cursor:pointer;min-height:40px}
+button.on{background:var(--red);color:#fff;border-color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat{padding:12px 14px;border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+.stat b{display:block;font:800 22px/1.15 system-ui,sans-serif;color:var(--ink)}
+.stat b i{font-style:normal;font-size:12px;font-weight:600;color:var(--muted)}
+.stat.hot b{color:var(--red)}
+.eq{padding:12px 14px;font:700 15px ui-monospace,Menlo,monospace;display:flex;flex-wrap:wrap;gap:6px 22px}
+.note{padding:0 14px 14px;color:var(--muted);font-size:13px}
+ol.parts{list-style:none;margin:0;padding:6px 8px 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px 14px}
+ol.parts li{display:flex;gap:10px;align-items:center;padding:7px 6px;cursor:pointer;border-radius:4px}
+ol.parts li:hover,ol.parts li.hl{background:var(--chip)}
+.n{flex:none;width:24px;height:24px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;font:700 12px sans-serif}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.cols .card{margin:0}
+.cols h3{margin:0;padding:12px 14px 4px;font-size:16px}
+.cols p{margin:0;padding:0 14px 8px;color:var(--muted);font-size:13.5px}
+.cols ul{margin:0;padding:0 14px 14px 30px;font-size:13.5px}
+.cols li::marker{color:var(--red)}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 14px;padding:12px 14px}
+.calc label{font:600 11px ui-monospace,Menlo,monospace;color:var(--muted);display:block}
+.calc input{width:100%;font:600 15px ui-monospace,Menlo,monospace;padding:7px 8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+footer{margin-top:22px;font:11px/1.5 ui-monospace,Menlo,monospace;color:var(--muted)}
+#msg{padding:0 14px 12px;font-size:13px;color:var(--red);min-height:1px}
+.theme{position:absolute;right:16px;top:calc(18px + env(safe-area-inset-top,0px));font-size:12px;padding:6px 10px;min-height:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="theme" id="themeBtn" type="button">Light / dark</button>
+  <span class="tag">DRG. NO. GYRO-001 · WEB PAGE</span>
+  <div class="logo">GYRO LAB</div>
+  <div class="sub">Gyroscopic apparatus · Theory of Machines lab · COEP Tech</div>
+
+  <h1>The whole lab, interactive</h1>
+  <p class="lead">Take the gyroscope apart, set the spin speed and the load, and watch it precess. Drag the model to turn it; scroll or pinch-zoom with the zoom buttons.</p>
+
+  <div class="card" id="viewer">
+    <span class="lbl">Fig. 1 · Motorised gyroscope</span>
+    <div id="stage">
+      <video id="cam" playsinline muted></video>
+      <canvas id="c"></canvas>
+      <div id="hud">drag to rotate</div>
+    </div>
+    <div class="ctl">
+      <div><label>Explode <b id="vE">0%</b></label><input id="sE" type="range" min="0" max="100" value="0"></div>
+      <div><label>Spin speed N <b id="vN">1800 rpm</b></label><input id="sN" type="range" min="0" max="3000" step="50" value="1800"></div>
+      <div><label>Load on arm <b id="vL">300 g</b></label><input id="sL" type="range" min="0" max="1000" step="50" value="300"></div>
+    </div>
+    <div class="btns">
+      <button id="bRev" type="button">Reverse spin</button>
+      <button id="bPause" type="button">Pause</button>
+      <button id="bZin" type="button">Zoom +</button>
+      <button id="bZout" type="button">Zoom −</button>
+      <button id="bReset" type="button">Reset view</button>
+      <button id="bCam" type="button">Overlay on camera</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <div class="card">
+    <span class="lbl">Live readings</span>
+    <div class="grid">
+      <div class="stat"><span class="lbl">Spin ω</span><b id="rW">0 <i>rad/s</i></b></div>
+      <div class="stat"><span class="lbl">Rotor inertia I</span><b id="rI">0 <i>kg·m²</i></b></div>
+      <div class="stat"><span class="lbl">Momentum H = Iω</span><b id="rH">0 <i>kg·m²/s</i></b></div>
+      <div class="stat"><span class="lbl">Load torque m·g·l</span><b id="rT">0 <i>N·m</i></b></div>
+      <div class="stat hot"><span class="lbl">Precession ωp</span><b id="rP">0 <i>rad/s</i></b></div>
+      <div class="stat hot"><span class="lbl">Time for 90° swing</span><b id="rS">0 <i>s</i></b></div>
+    </div>
+    <div class="eq"><span>H = I ω</span><span>C = I ω ωp</span><span>ωp = m g l / (I ω)</span><span>I = ½ m r²</span></div>
+    <div class="note" id="dirNote">Double the spin speed and the precession rate halves. Double the load and it doubles.</div>
+    <div class="calc">
+      <div><label>ROTOR MASS m (kg)</label><input id="iM" type="number" step="0.1" value="2.0"></div>
+      <div><label>ROTOR RADIUS r (m)</label><input id="iR" type="number" step="0.01" value="0.10"></div>
+      <div><label>ARM LENGTH l (m)</label><input id="iA" type="number" step="0.01" value="0.20"></div>
+    </div>
+    <div class="note">The values above are illustrative. Replace them with your own apparatus values.</div>
+  </div>
+
+  <div class="card"><span class="lbl">Parts list · tap to highlight</span>
+    <ol class="parts" id="parts"></ol>
+  </div>
+
+  <div class="cols">
+    <div class="card"><span class="lbl">Experiment A</span><h3>Verify C = I·ω·ωp</h3>
+      <p>Hang a known weight, time the precession, compare with the load torque.</p>
+      <ul><li>Read ω from the tachometer.</li><li>Time a fixed swing for ωp.</li><li>Compare I·ω·ωp with m·g·l.</li></ul></div>
+    <div class="card"><span class="lbl">Experiment B</span><h3>Which way does it turn?</h3>
+      <p>Spin, load torque and precession are mutually perpendicular.</p>
+      <ul><li>Press “Reverse spin” and watch the precession flip.</li><li>Predict first, then check.</li></ul></div>
+    <div class="card"><span class="lbl">Experiment C</span><h3>Faster spin, slower precession</h3>
+      <p>For a fixed load, ωp is proportional to 1/ω.</p>
+      <ul><li>Move the speed slider and read ωp.</li><li>Plot ωp against 1/ω: a straight line.</li></ul></div>
+    <div class="card"><span class="lbl">Where it matters</span><h3>Real machines</h3>
+      <p>Ships, aircraft, two-wheelers, spacecraft, gyrocompasses and drone IMUs all rely on, or must cope with, gyroscopic effects.</p></div>
+  </div>
+
+  <footer>DRG. NO. GYRO-001 · Gyroscopic Apparatus · Dept. of Mechanical Engineering, COEP Tech.<br>Model is schematic and not to scale. Replace the example values with readings from your own apparatus. Keep hands clear of the spinning rotor in the lab.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id)};
+// theme toggle
+var root=document.documentElement;
+$('themeBtn').onclick=function(){var dark=getComputedStyle(root).colorScheme==='dark';root.setAttribute('data-theme',dark?'light':'dark')};
+
+var canvas=$('c'),stage=$('stage');
+if(typeof THREE==='undefined'){$('msg').textContent='The 3D library could not load. Check your connection and reload.';return;}
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+var scene=new THREE.Scene();
+var cam=new THREE.PerspectiveCamera(38,1,0.1,100);
+scene.add(new THREE.AmbientLight(0xffffff,0.7));
+var dl=new THREE.DirectionalLight(0xffffff,0.9);dl.position.set(6,10,7);scene.add(dl);
+var dl2=new THREE.DirectionalLight(0xffffff,0.35);dl2.position.set(-6,3,-5);scene.add(dl2);
+
+function mat(c){return new THREE.MeshStandardMaterial({color:c,roughness:0.55,metalness:0.25})}
+var DARK=mat(0x2b3752),GREY=mat(0xcfcbbe),RED=mat(0xd4412a),LIGHT=mat(0xe9e4d4);
+function box(w,h,d,m){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m)}
+function cyl(r,h,m,axis,seg){var g=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg||40),m);if(axis==='x')g.rotation.z=Math.PI/2;if(axis==='z')g.rotation.x=Math.PI/2;return g}
+var parts={};
+function part(id,g,ex){g.userData.ex=new THREE.Vector3(ex[0],ex[1],ex[2]);g.userData.base=g.position.clone();parts[id]=g;return g}
+function at(m,x,y,z){m.position.set(x,y,z);return m}
+
+// static parts
+var base=new THREE.Group();base.add(at(box(6.6,0.4,4.2,DARK),0,0.2,0));
+[[-2.9,-1.8],[2.9,-1.8],[-2.9,1.8],[2.9,1.8]].forEach(function(p){base.add(at(cyl(0.18,0.2,DARK),p[0],-0.05,p[1]))});
+scene.add(part(1,base,[0,-1.3,0]));
+var turn=new THREE.Group();turn.add(at(cyl(2.3,0.18,GREY,null,64),0,0.55,0));
+var ring=new THREE.Mesh(new THREE.TorusGeometry(2.12,0.025,8,96),DARK);ring.rotation.x=Math.PI/2;ring.position.y=0.66;turn.add(ring);
+for(var a=0;a<36;a++){var t=box(0.04,0.02,0.22,DARK);var an=a/36*Math.PI*2;t.position.set(Math.cos(an)*2.0,0.65,Math.sin(an)*2.0);t.rotation.y=-an+Math.PI/2;turn.add(t)}
+scene.add(part(2,turn,[0,-0.5,0]));
+var pillar=new THREE.Group();pillar.add(at(cyl(0.28,1.3,DARK),0,1.3,0));pillar.add(at(cyl(0.5,0.14,DARK),0,1.95,0));
+scene.add(part(3,pillar,[0,0.4,0]));
+var ctrl=new THREE.Group();ctrl.add(at(box(1.9,1.0,1.3,GREY),0,0.9,0));
+var disp=box(0.7,0.28,0.04,DARK);disp.position.set(-0.4,1.05,0.67);ctrl.add(disp);
+var knob=cyl(0.26,0.12,DARK,'z');knob.position.set(0.55,1.0,0.7);ctrl.add(knob);
+ctrl.add(at(box(0.5,0.06,0.04,RED),0.55,1.0,0.77));
+ctrl.position.set(4.6,0,1.9);
+scene.add(part(8,ctrl,[1.6,-0.2,0.8]));
+
+// precessing assembly
+var G=new THREE.Group();G.position.set(0,2.02,0);scene.add(G);
+var frame=new THREE.Group();frame.add(at(box(4.0,0.22,0.5,GREY),0,0.11,0));
+[-1.85,1.85].forEach(function(x){frame.add(at(box(0.2,1.9,0.5,GREY),x,1.0,0));frame.add(at(cyl(0.24,0.34,DARK,'x'),x+(x<0?0.05:-0.05),1.25,0))});
+frame.add(at(cyl(0.15,0.4,DARK),0,-0.1,0));
+G.add(part(4,frame,[0,1.2,0]));
+var rotorG=new THREE.Group();rotorG.position.set(0,1.25,0);
+var rotor=new THREE.Group();
+rotor.add(cyl(0.07,4.9,DARK,'x'));
+rotor.add(at(cyl(0.88,0.28,DARK,'x',64),0,0,0));
+rotor.add(at(cyl(0.3,0.36,GREY,'x'),0,0,0));
+rotor.add(at(box(0.32,0.12,0.12,RED),0,0.8,0));
+rotor.add(at(box(0.32,0.12,0.12,RED),0,-0.8,0));
+rotorG.add(rotor);rotorG.position.set(-0.15,1.25,0);
+G.add(part(5,rotorG,[0,2.5,0]));
+var motor=new THREE.Group();motor.add(at(cyl(0.42,1.0,DARK,'x'),0,0,0));motor.add(at(cyl(0.44,0.06,GREY,'x'),0.5,0,0));
+motor.position.set(2.85,1.25,0);G.add(part(6,motor,[1.5,2.5,0]));
+var arm=new THREE.Group();arm.add(at(box(2.2,0.1,0.1,DARK),0,0,0));
+arm.add(at(cyl(0.02,1.0,DARK),-0.9,-0.5,0));
+var wt=new THREE.Group();wt.position.set(-0.9,-1.05,0);arm.add(wt);
+var wtMesh=cyl(0.38,0.2,RED);wt.add(wtMesh);
+arm.position.set(-3.7,1.25,0);G.add(part(7,arm,[-1.6,2.5,0]));
+
+// camera orbit
+var cam0={az:0.75,el:0.38,r:13.5};var o={az:cam0.az,el:cam0.el,r:cam0.r,zoom:1};
+function placeCam(){var e=parseFloat($('sE').value)/100;var r=(o.r+e*5)*o.zoom;var ty=2.0+e*0.8;
+ cam.position.set(Math.sin(o.az)*Math.cos(o.el)*r,ty+Math.sin(o.el)*r,Math.cos(o.az)*Math.cos(o.el)*r);cam.lookAt(0,ty,0)}
+var drag=null;
+canvas.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
+canvas.addEventListener('pointermove',function(e){if(!drag)return;o.az-=(e.clientX-drag.x)*0.01;o.el=Math.max(-0.1,Math.min(1.35,o.el+(e.clientY-drag.y)*0.008));drag={x:e.clientX,y:e.clientY}});
+function endDrag(){drag=null;canvas.style.cursor='grab'}
+canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
+canvas.addEventListener('wheel',function(e){e.preventDefault();o.zoom=Math.max(0.5,Math.min(1.8,o.zoom*(e.deltaY>0?1.06:0.94)))},{passive:false});
+$('bZin').onclick=function(){o.zoom=Math.max(0.5,o.zoom*0.85)};
+$('bZout').onclick=function(){o.zoom=Math.min(1.8,o.zoom/0.85)};
+$('bReset').onclick=function(){o.az=cam0.az;o.el=cam0.el;o.zoom=1};
+
+function resize(){var w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+window.addEventListener('resize',resize);resize();
+
+// physics
+var s=1,paused=false,Nrpm=1800,loadG=300,explode=0,tilt=0;
+function vals(){var m=parseFloat($('iM').value)||0,r=parseFloat($('iR').value)||0,l=parseFloat($('iA').value)||0;
+ var I=0.5*m*r*r,w=2*Math.PI*Nrpm/60,T=loadG/1000*9.81*l,wp=(w>0.5&&I>0)?T/(I*w):0;return{I:I,w:w,T:T,wp:wp,H:I*w}}
+function f(x,d){return isFinite(x)?x.toFixed(d):'–'}
+function readout(){var v=vals();
+ $('vE').textContent=Math.round(explode*100)+'%';$('vN').textContent=Nrpm+' rpm';$('vL').textContent=loadG+' g';
+ $('rW').innerHTML=f(v.w,1)+' <i>rad/s</i>';$('rI').innerHTML=f(v.I,4)+' <i>kg·m²</i>';$('rH').innerHTML=f(v.H,3)+' <i>kg·m²/s</i>';
+ $('rT').innerHTML=f(v.T,3)+' <i>N·m</i>';$('rP').innerHTML=(v.wp>0?f(v.wp,3):'0')+' <i>rad/s</i>';
+ $('rS').innerHTML=(v.wp>0?f((Math.PI/2)/v.wp,1):'–')+' <i>s</i>';
+ var msg='Double the spin speed and the precession rate halves. Double the load and it doubles.';
+ if(Nrpm<250&&loadG>0)msg='Rotor too slow: the load simply tips the arm down instead of precessing.';
+ else if(loadG===0)msg='No load, no couple, no precession. Add weight on the arm.';
+ $('dirNote').textContent=msg}
+['sE','sN','sL','iM','iR','iA'].forEach(function(id){$(id).addEventListener('input',function(){explode=parseFloat($('sE').value)/100;Nrpm=parseInt($('sN').value,10);loadG=parseInt($('sL').value,10);readout()})});
+$('bRev').onclick=function(){s=-s;this.classList.toggle('on',s<0)};
+$('bPause').onclick=function(){paused=!paused;this.textContent=paused?'Resume':'Pause';this.classList.toggle('on',paused)};
+
+// parts list
+var names={1:['Base plate','levelling feet, carries the rig'],2:['Turntable','scale reads the precession angle'],3:['Pillar','vertical axis the frame swings about'],4:['Frame','yoke that holds the shaft bearings'],5:['Rotor disc','the flywheel that stores momentum'],6:['Motor','spins the rotor to a set speed'],7:['Load arm + weights','apply a known torque'],8:['Control box','speed regulator and rpm display']};
+var hl=null,list=$('parts');
+Object.keys(names).forEach(function(k){var li=document.createElement('li');li.innerHTML='<span class="n">'+k+'</span><span><b>'+names[k][0]+'</b> · '+names[k][1]+'</span>';
+ li.onclick=function(){hl=(hl==k)?null:k;Array.prototype.forEach.call(list.children,function(c){c.classList.remove('hl')});if(hl)li.classList.add('hl')};list.appendChild(li)});
+function applyHL(){Object.keys(parts).forEach(function(k){parts[k].traverse(function(m){if(m.material){var mm=m.material;if(mm.emissive)mm.emissive.setHex(0x000000)}})});
+ if(hl&&parts[hl])parts[hl].traverse(function(m){if(m.material&&m.material.emissive)m.material.emissive.setHex(0x553322)})}
+// materials are shared, so highlight uses a pulsing scale instead
+var t0=performance.now(),pulse=0;
+
+// camera overlay (AR-style)
+var stream=null;
+$('bCam').onclick=function(){var b=this,v=$('cam');
+ if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null;v.style.display='none';v.srcObject=null;b.classList.remove('on');b.textContent='Overlay on camera';return}
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('msg').textContent='Camera overlay is not available in this view. Open this page directly in your phone’s browser.';return}
+ navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(function(s_){stream=s_;v.srcObject=s_;v.style.display='block';v.play();b.classList.add('on');b.textContent='Stop camera';$('msg').textContent='';o.zoom=1.25;
+  document.getElementById('hud').textContent='point at a table · drag to turn · zoom to resize'}).catch(function(){$('msg').textContent='Camera access was blocked. Allow the camera, or open this page directly in your phone’s browser.'})};
+if(location.hash==='#ar'){document.getElementById('viewer').scrollIntoView();$('hud').textContent='tap “Overlay on camera”, then point at a table'}
+
+var last=performance.now();
+function frameLoop(now){requestAnimationFrame(frameLoop);var dt=Math.min(0.05,(now-last)/1000);last=now;
+ var v=vals();
+ // explode
+ Object.keys(parts).forEach(function(k){var g=parts[k];g.position.copy(g.userData.base).addScaledVector(g.userData.ex,explode)});
+ if(!paused){
+  rotorRot+=s*Math.min(v.w,314)/314*18*dt;
+  var wpv=Math.min(v.wp,4);G.rotation.y+=-s*wpv*dt;
+ }
+ rotor.rotation.x=rotorRot;
+ var target=(Nrpm<250&&loadG>0)?-Math.min(0.45,0.1+loadG/2500):0;tilt+=(target-tilt)*Math.min(1,dt*4);G.rotation.z=-tilt;
+ wt.visible=loadG>0;var hh=0.12+loadG/1000*0.5;wtMesh.scale.y=hh/0.2;wtMesh.position.y=0;
+ // highlight pulse
+ pulse+=dt*5;Object.keys(parts).forEach(function(k){var sc=(hl==k)?1+0.04*Math.sin(pulse):1;parts[k].scale.setScalar(sc)});
+ placeCam();renderer.render(scene,cam)}
+var rotorRot=0;
+readout();requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
